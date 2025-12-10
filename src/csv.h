@@ -1,12 +1,16 @@
 #ifndef CSV_H
 #define CSV_H
 
-#include "array_ops.h"
+typedef struct {
+    int id;
+    char filename[100];
+    int width;
+    int height;
+    float size_kb;
+    int bit_depth;
+} Image;
 
-// Loads all rows from CSV into a dynamic array
-int loadCSV(const char *filename, Image **images, int *size, int *capacity);
-
-// Saves dynamic array back to CSV
-int saveCSV(const char *filename, Image *images, int size);
+Image* loadCSV(const char* filepath, int* count);
+void freeArray(Image* arr);
 
 #endif

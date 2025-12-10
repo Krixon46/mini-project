@@ -1,3 +1,4 @@
-1,cat.jpg,1920,1080,244.5,24
-2,tree.png,1280,720,123.4,32
-3,bird.bmp,4000,3000,1530.0,24
+id,filename,width,height,size_kb,bit_depth
+1,photo.jpg,1920,1080,350.5,24
+2,cat.png,1280,720,120.3,32
+3,tree.bmp,640,480,200.8,24

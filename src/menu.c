@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include "menu.h"
-#include "csv.h"
-#include "array_ops.h"
 
-void startMenu() {
-    printf("=====================================\n");
-    printf(" IMAGE METADATA MANAGEMENT SYSTEM\n");
-    printf("=====================================\n");
-
-    printf("Menu will be implemented soon...\n");
+void showMenu() {
+    printf("\n==============================\n");
+    printf(" IMAGE METADATA MANAGEMENT\n");
+    printf("==============================\n");
+    printf("1. Load CSV\n");
+    printf("2. Display All Records\n");
+    printf("3. Exit\n");
+    printf("Choose an option: ");
 }

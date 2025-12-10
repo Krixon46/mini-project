@@ -1,30 +1,19 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include "array_ops.h"
 
-// initialize empty array with capacity 10
-void initArray(Image **images, int *size, int *capacity) {
-    *size = 0;
-    *capacity = 10;
-    *images = malloc((*capacity) * sizeof(Image));
-
-    if (*images == NULL) {
-        printf("Malloc failed! Exiting.\n");
-        exit(1);
-    }
-}
-
-// Add an image (dynamic expansion)
-void addImage(Image **images, int *size, int *capacity, Image img) {
-    if (*size >= *capacity) {
-        *capacity *= 2;
-        *images = realloc(*images, (*capacity) * sizeof(Image));
-        if (*images == NULL) {
-            printf("Realloc failed! Exiting.\n");
-            exit(1);
-        }
+void displayImages(Image* arr, int count) {
+    if (count == 0) {
+        printf("\nNo records loaded.\n");
+        return;
     }
 
-    (*images)[(*size)++] = img;
+    printf("\n===== IMAGE RECORDS =====\n");
+    for (int i = 0; i < count; i++) {
+        printf("ID: %d\n", arr[i].id);
+        printf("Filename: %s\n", arr[i].filename);
+        printf("Resolution: %dx%d\n", arr[i].width, arr[i].height);
+        printf("Size: %.2f KB\n", arr[i].size_kb);
+        printf("Bit Depth: %d\n", arr[i].bit_depth);
+        printf("-----------------------------\n");
+    }
 }
