@@ -1,13 +1,14 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "menu.h"
 
 int main()
 {
-    printf("====================================\n");
-    printf("   IMAGE METADATA MANAGEMENT SYSTEM\n");
-    printf("====================================\n");
+    Image* images = NULL;
+    int count = 0;
 
-    showMenu();   // NEW LINE
+    runMenu(&images, &count);
 
+    free(images);
     return 0;
 }

@@ -1,6 +1,8 @@
 #ifndef MENU_H
 #define MENU_H
 
-void showMenu();
+#include "csv.h"
+
+void runMenu(Image** images, int* count);
 
 #endif

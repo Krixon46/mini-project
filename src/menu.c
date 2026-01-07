@@ -1,49 +1,40 @@
 #include <stdio.h>
 #include "menu.h"
+#include "array_ops.h"
+#include "csv.h"
 
-void showMenu()
+void runMenu(Image** images, int* count)
 {
     int choice;
 
     while (1)
     {
-        printf("\n=============================\n");
-        printf("        MAIN MENU\n");
-        printf("=============================\n");
-        printf("1. Load images from CSV\n");
-        printf("2. Display all images\n");
-        printf("3. Add new image\n");
-        printf("4. Delete an image\n");
-        printf("5. Save and Exit\n");
-        printf("=============================\n");
-        printf("Enter your choice: ");
-
+        printf("\n1.Load  2.Display  3.Add  4.Search  5.Sort  6.Delete  7.Save & Exit\n");
         scanf("%d", &choice);
 
         switch (choice)
         {
             case 1:
-                printf("Loading CSV... (will implement later)\n");
+                *images = loadCSV("data/images.csv", count);
                 break;
-
             case 2:
-                printf("Displaying images... (will implement later)\n");
+                displayImages(*images, *count);
                 break;
-
             case 3:
-                printf("Adding new image... (will implement later)\n");
+                addImage(images, count);
                 break;
-
             case 4:
-                printf("Deleting image... (will implement later)\n");
+                searchImage(*images, *count);
                 break;
-
             case 5:
-                printf("Saving and exiting...\n");
-                return;   // Exit menu
-
-            default:
-                printf("Invalid choice! Try again.\n");
+                sortByHeight(*images, *count);
+                break;
+            case 6:
+                deleteImage(*images, count);
+                break;
+            case 7:
+                saveCSV("data/images.csv", *images, *count);
+                return;
         }
     }
 }

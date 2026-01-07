@@ -11,6 +11,7 @@ typedef struct {
 } Image;
 
 Image* loadCSV(const char* filepath, int* count);
+void saveCSV(const char* filepath, Image* images, int count);
 void freeArray(Image* arr);
 
 #endif

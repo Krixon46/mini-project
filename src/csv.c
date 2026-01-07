@@ -46,3 +46,26 @@ Image* loadCSV(const char* filepath, int* count) {
 void freeArray(Image* arr) {
     free(arr);
 }
+void saveCSV(const char* filepath, Image* images, int count)
+{
+    FILE* fp = fopen(filepath, "w");
+    if (!fp) {
+        printf("Error saving file.\n");
+        return;
+    }
+
+    fprintf(fp, "id,filename,width,height,size_kb,bit_depth\n");
+
+    for (int i = 0; i < count; i++) {
+        fprintf(fp, "%d,%s,%d,%d,%.2f,%d\n",
+            images[i].id,
+            images[i].filename,
+            images[i].width,
+            images[i].height,
+            images[i].size_kb,
+            images[i].bit_depth
+        );
+    }
+
+    fclose(fp);
+}
