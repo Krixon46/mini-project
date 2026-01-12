@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Metadata Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 30px;
+        }
+
+        .section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="file"],
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        input[type="file"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            min-width: 150px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .images-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .image-card {
+            background: white;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-card h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .image-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            font-size: 0.95em;
+            color: #555;
+        }
+
+        .image-info span {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .image-actions {
+            margin-top: 12px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .image-actions button {
+            flex: 1;
+            padding: 8px 12px;
+            font-size: 0.9em;
+        }
+
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-box {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .image-info {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .emoji {
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🖼️ Image Metadata Manager</h1>
+            <p>Upload, manage, and organize your image metadata</p>
+        </header>
+
+        <div class="main-content">
+            <!-- Left Panel: Add Image -->
+            <div>
+                <div class="section">
+                    <h2><span class="emoji">➕</span> Upload Image</h2>
+                    <div id="alert-add" class="alert"></div>
+                    
+                    <div class="form-group">
+                        <label for="image-file">Select Image File (JPG/PNG):</label>
+                        <input type="file" id="image-file" accept=".jpg,.jpeg,.png" placeholder="Choose image file">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="image-id">Image ID:</label>
+                        <input type="number" id="image-id" placeholder="e.g., 1">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="width">Width (pixels):</label>
+                        <input type="number" id="width" placeholder="Auto-detected or enter manually">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="height">Height (pixels):</label>
+                        <input type="number" id="height" placeholder="Auto-detected or enter manually">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bit-depth">Bit Depth:</label>
+                        <select id="bit-depth">
+                            <option value="8">8-bit</option>
+                            <option value="16">16-bit</option>
+                            <option value="24" selected>24-bit (RGB)</option>
+                            <option value="32">32-bit (RGBA)</option>
+                        </select>
+                    </div>
+
+                    <div id="preview-container" style="display:none; margin: 15px 0;">
+                        <label>Preview:</label>
+                        <img id="preview-image" src="" alt="Preview" style="max-width: 100%; max-height: 200px; border-radius: 5px;">
+                    </div>
+
+                    <div class="button-group">
+                        <button class="btn-primary" onclick="uploadImage()">Upload Image</button>
+                        <button class="btn-secondary" onclick="clearAddForm()">Clear</button>
+                    </div>
+                </div>
+
+                <div class="section" style="margin-top: 20px;">
+                    <h2><span class="emoji">🔍</span> Search Image</h2>
+                    <div id="alert-search" class="alert"></div>
+
+                    <div class="form-group">
+                        <label for="search-id">Enter Image ID:</label>
+                        <input type="number" id="search-id" placeholder="e.g., 1">
+                    </div>
+
+                    <button class="btn-primary" onclick="searchImage()" style="width: 100%;">Search</button>
+
+                    <div id="search-result" style="margin-top: 15px;"></div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Images List -->
+            <div>
+                <div class="section">
+                    <h2><span class="emoji">📊</span> Statistics</h2>
+                    <div class="stats">
+                        <div class="stat-box">
+                            <div class="stat-number" id="total-images">0</div>
+                            <div class="stat-label">Total Images</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-number" id="total-size">0</div>
+                            <div class="stat-label">Total Size (KB)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section" style="margin-top: 20px;">
+                    <h2><span class="emoji">📁</span> All Images</h2>
+                    <div id="alert-list" class="alert"></div>
+
+                    <div class="button-group" style="margin-bottom: 15px;">
+                        <button class="btn-success" onclick="loadImages()">Refresh</button>
+                        <select id="sort-type" style="flex: 1;">
+                            <option value="1">Sort by ID</option>
+                            <option value="2">Sort by Filename</option>
+                            <option value="3">Sort by Width</option>
+                            <option value="4">Sort by Height</option>
+                            <option value="5">Sort by Size</option>
+                            <option value="6">Sort by Bit Depth</option>
+                        </select>
+                        <button class="btn-secondary" onclick="sortImages()">Sort</button>
+                    </div>
+
+                    <div class="loading" id="loading">
+                        <div class="spinner"></div>
+                        <p>Loading...</p>
+                    </div>
+
+                    <div class="images-list" id="images-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8080/api';
+
+        // Show alert message
+        function showAlert(containerId, message, type = 'success') {
+            const alertEl = document.getElementById(containerId);
+            alertEl.className = `alert show alert-${type}`;
+            alertEl.textContent = message;
+            setTimeout(() => alertEl.classList.remove('show'), 4000);
+        }
+
+        // Image preview
+        document.getElementById('image-file').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = new Image();
+                    img.onload = function() {
+                        document.getElementById('preview-image').src = event.target.result;
+                        document.getElementById('preview-container').style.display = 'block';
+                        
+                        // Auto-fill dimensions
+                        if (!document.getElementById('width').value) {
+                            document.getElementById('width').value = img.width;
+                        }
+                        if (!document.getElementById('height').value) {
+                            document.getElementById('height').value = img.height;
+                        }
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Load all images
+        async function loadImages() {
+            const loading = document.getElementById('loading');
+            const imagesList = document.getElementById('images-list');
+            
+            loading.style.display = 'block';
+            imagesList.innerHTML = '';
+
+            try {
+                const response = await fetch(`${API_URL}/images`);
+                const data = await response.json();
+                
+                if (data.images && data.images.length > 0) {
+                    displayImages(data.images);
+                    updateStats(data.images);
+                    showAlert('alert-list', `Loaded ${data.images.length} images`, 'info');
+                } else {
+                    imagesList.innerHTML = '<p style="text-align: center; color: #999;">No images found. Add some images to get started!</p>';
+                    updateStats([]);
+                }
+            } catch (error) {
+                showAlert('alert-list', 'Error loading images: ' + error.message, 'error');
+                console.error('Error:', error);
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        // Display images in list
+        function displayImages(images) {
+            const imagesList = document.getElementById('images-list');
+            imagesList.innerHTML = images.map(img => `
+                <div class="image-card">
+                    <h3>#${img.id} - ${img.filename}</h3>
+                    <div style="margin-bottom: 12px;">
+                        <img src="${API_URL}/image/${img.id}" alt="${img.filename}" style="max-width: 100%; max-height: 150px; border-radius: 5px; cursor: pointer;" onclick="window.open('${API_URL}/image/${img.id}', '_blank')">
+                    </div>
+                    <div class="image-info">
+                        <span><span class="info-label">Width:</span> ${img.width}px</span>
+                        <span><span class="info-label">Height:</span> ${img.height}px</span>
+                        <span><span class="info-label">Size:</span> ${img.size_kb.toFixed(2)}KB</span>
+                        <span><span class="info-label">Bit Depth:</span> ${img.bit_depth}-bit</span>
+                    </div>
+                    <div class="image-actions">
+                        <button class="btn-danger" onclick="deleteImage(${img.id})">Delete</button>
+                        <a href="${API_URL}/download/${img.id}" class="btn-secondary" style="text-decoration:none; display:inline-block; padding:8px 12px; background:#6c757d; color:white; border-radius:5px; flex:1; text-align:center;">Download</a>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Update statistics
+        function updateStats(images) {
+            const totalImages = document.getElementById('total-images');
+            const totalSize = document.getElementById('total-size');
+            
+            totalImages.textContent = images.length;
+            const size = images.reduce((sum, img) => sum + img.size_kb, 0);
+            totalSize.textContent = size.toFixed(2);
+        }
+
+        // Upload image file
+        async function uploadImage() {
+            const fileInput = document.getElementById('image-file');
+            const id = document.getElementById('image-id').value;
+            const width = document.getElementById('width').value;
+            const height = document.getElementById('height').value;
+            const bit_depth = document.getElementById('bit-depth').value;
+
+            if (!fileInput.files[0]) {
+                showAlert('alert-add', 'Please select an image file', 'error');
+                return;
+            }
+
+            if (!id || !width || !height) {
+                showAlert('alert-add', 'Please fill all fields (Image ID, Width, Height)', 'error');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('id', parseInt(id));
+            formData.append('width', parseInt(width));
+            formData.append('height', parseInt(height));
+            formData.append('bit_depth', parseInt(bit_depth));
+
+            try {
+                const response = await fetch(`${API_URL}/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showAlert('alert-add', 'Image uploaded successfully!', 'success');
+                    clearAddForm();
+                    loadImages();
+                } else {
+                    showAlert('alert-add', 'Error: ' + (data.error || 'Unknown error'), 'error');
+                }
+            } catch (error) {
+                showAlert('alert-add', 'Error uploading image: ' + error.message, 'error');
+                console.error('Error:', error);
+            }
+        }
+
+        // Search image
+        async function searchImage() {
+            const id = document.getElementById('search-id').value;
+            const searchResult = document.getElementById('search-result');
+
+            if (!id) {
+                showAlert('alert-search', 'Please enter an image ID', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/search?id=${id}`);
+                const data = await response.json();
+
+                if (data.found) {
+                    const img = data.image;
+                    searchResult.innerHTML = `
+                        <div class="image-card">
+                            <h3>#${img.id} - ${img.filename}</h3>
+                            <div class="image-info">
+                                <span><span class="info-label">Width:</span> ${img.width}px</span>
+                                <span><span class="info-label">Height:</span> ${img.height}px</span>
+                                <span><span class="info-label">Size:</span> ${img.size_kb.toFixed(2)}KB</span>
+                                <span><span class="info-label">Bit Depth:</span> ${img.bit_depth}-bit</span>
+                            </div>
+                        </div>
+                    `;
+                    showAlert('alert-search', 'Image found!', 'success');
+                } else {
+                    searchResult.innerHTML = '';
+                    showAlert('alert-search', 'Image not found', 'error');
+                }
+            } catch (error) {
+                showAlert('alert-search', 'Error searching image: ' + error.message, 'error');
+                console.error('Error:', error);
+            }
+        }
+
+        // Delete image
+        async function deleteImage(id) {
+            if (!confirm(`Are you sure you want to delete image #${id}?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/images?id=${id}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showAlert('alert-list', 'Image deleted successfully!', 'success');
+                    loadImages();
+                } else {
+                    showAlert('alert-list', 'Error: ' + (data.error || 'Unknown error'), 'error');
+                }
+            } catch (error) {
+                showAlert('alert-list', 'Error deleting image: ' + error.message, 'error');
+                console.error('Error:', error);
+            }
+        }
+
+        // Sort images
+        async function sortImages() {
+            const sortType = document.getElementById('sort-type').value;
+
+            try {
+                const response = await fetch(`${API_URL}/sort?type=${sortType}`);
+                const data = await response.json();
+
+                if (response.ok) {
+                    showAlert('alert-list', 'Images sorted successfully!', 'success');
+                    loadImages();
+                } else {
+                    showAlert('alert-list', 'Error sorting images', 'error');
+                }
+            } catch (error) {
+                showAlert('alert-list', 'Error sorting images: ' + error.message, 'error');
+                console.error('Error:', error);
+            }
+        }
+
+        // Clear form
+        function clearAddForm() {
+            document.getElementById('image-file').value = '';
+            document.getElementById('image-id').value = '';
+            document.getElementById('width').value = '';
+            document.getElementById('height').value = '';
+            document.getElementById('bit-depth').value = '24';
+            document.getElementById('preview-container').style.display = 'none';
+        }
+
+        // Load images on page load
+        window.addEventListener('load', loadImages);
+    </script>
+</body>
+</html>
